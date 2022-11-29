@@ -1,0 +1,130 @@
+\chapter{Clustering Spatial Transcriptomics}
+\newcommand{\bb[1]}{\textbf{#1}}
+\newcommand{\fict}{{FICT}}
+\newcommand{\smfish}{{smfishHmrf}}
+\begin{figure*}[htbp]
+\includegraphics[width=\textwidth]{figs/Method.png}
+\caption{\fict\ pipeline. A reduced dimension expression profile is generated using a Denoising Autoencoder \cite{vincent2008extracting}, and an undirected graph is constructed according to the spatial locations information. Cells are initially clustered using an expression only GMM. Next, the the model is iteratively optimized using an EM algorithm to improve the joint likelihood of the expression and neighborhood models given both the gene expression representation and the spatial graph. The final output is an assignment of cells to clusters, a Gaussian gene expression model and a Multinomial neighborhood model for each class.}
+\label{fig:train}
+\end{figure*}
+We developed a joint expression and location clustering method called FICT to infer cell types in spatial transcriptomics studies. A generative mixture model is defined firstly: each cell is assigned a cell type given its neighborhood, and then the dimension reduced representation of gene expression levels are drawn from cell-type specific distribution. We next learn the parameters of this generative model by maximizing the joint likelihood of gene expression and cell location (Figure \ref{fig:train}). The cell type is then inferred by the posterior distribution of this generative model given the gene expression level and cell location. To test the method we used both simulated and real single cell spatial transcriptomics data. 
+
+\subsection{A generative model for spatial transcriptomics data}
+We assume  \textcolor{black}{an undirected, weighted} graph $\boldsymbol{G}$ representing cell neighborhoods. Each node in $G$ is a cell. We assume a total of $M$ cell types in the dataset. We denote by \textcolor{black}{Z  the cell type assignments for nodes in G where $z^i$ is the cell type of cell $i$} and denote by \textcolor{black}{$X = {x^{i}}$} the gene expression matrix. Here, \textcolor{black}{$x^{i}$ is the gene expression levels vector for cell $i$ and X is the gene expression matrix for the expression of all cells. Finally, we define the neighbors of cell $i$ in $G$  using $ N_{\boldsymbol{G}(i)}$. Neighborhood is either defined using the $k$ nearest neighbors (we used k=10 in this paper) or a cutoff on the distance between $i$ and other nodes in $G$ (a cutoff on the edge weight).}
+Using these definitions we assume the following generative model for a single cell transcriptomics dataset.: (1) First, a cell type is selected according to \textcolor{black}{$P_{\theta}(Z) \propto \prod_{i}{P(z^i|N_{\boldsymbol{G}}(z^i))}$, in which $P(z^i|N_{\boldsymbol{G}}(z^i))$ is the conditional distribution for the assignment of cell i given its neighborhood} capturing the relationship between neighboring cells $N_{\boldsymbol{G}}(z)$ in $\boldsymbol{G}$. (2) Next, expression levels $\mathbf{X}$ are generated according to a cell type specific probability distribution \textcolor{black}{$P(x^{i}|z^{i})$}.
+
+Given this model the likelihood of a dataset with a set of gene expression levels $X$ and cell locations ($\boldsymbol{G}$) is:
+\begin{equation}
+P(X) =\sum_{Z}{({P(X|Z)}\cdot P(Z))} \propto \sum_{z \in Z}{(\prod_{i}{P(x^i|z^i)}\textcolor{black}{P_{\theta}(z^i,N_{\boldsymbol{G}}(z^i)))}}
+\end{equation} 
+
+We use a multinomial distribution to model the relationship with neighborhood cells and so the \textcolor{black}{product of the conditional probability} can be written as:
+\begin{equation}
+    \textcolor{black}{P_{\theta}(z^i,N_{\boldsymbol{G}}(z^i))} = P(y^i|z^i)
+\end{equation}
+\textcolor{black}{Where $y^i$ is a vector summarizing the cell type assignments for neighbors of $i$. Specifically, $y^i$ is of dimensions $M$ (number of cell types) and each entry $j$ demotes the number of neighbors of cell $i$ assigned to cell type $j$.}
+Combined, the overall likelihood function is:
+\begin{equation}
+P(X,Y) = \prod_{i=1}^{D}{ \sum_{k}{P(z^i=k)P(x^i|z^i=m)P(y^i|z^i=m)}} 
+\end{equation}
+Where $X$ is the dimension reduced gene expression matrix and $Y$ is the neighborhood cell type count matrix for each cell, \textcolor{black}{m denotes the $m_{th}$ cell type}, we also change the order of product and sum as y is now treated as a property of the cells. We assume that $P(x^i|z^i=k)$ follows a Gaussian distribution and $P(y^i|z^i=k)$ follows a multinomial distribution. 
+
+\subsection{Inferring cell types (E-step)}
+\label{expectation}
+We use an Expectation Maximization (EM) approach to learn the parameters of the model. EM iterates between the expectation (E) and maximization (M) steps.
+Given the generative model, to infer cell types we need to calculate the posterior probability $P(z|x,y)$. However, computing these assignments is challenging since changing the assignment of a specific cell type (i.e. changes to Z') also change the neighborhood count Y for other cells. Thus, we perform an iterative procedure as follows: In the first phase Y is treated as a fixed vector for each  cell, and is used to calculate the posterior distribution of cell i given the gene expression matrix $x_i$ and current neighborhood count $y_i$ by setting:
+\textcolor{black}{
+\begin{equation}
+    P(z^{i}=m|x^{i},y^{i}) \propto \mathcal{N}(x_i;\boldsymbol{\mu}_m,\boldsymbol{\Sigma}_m) \mathcal{M}(y_i;\boldsymbol{\theta}_m)
+\end{equation}}
+In which \textcolor{black}{$\mathcal{N}(\boldsymbol{\mu}_m,\boldsymbol{\Sigma}_m)$} is a multi-variate Gaussian distribution with mean \textcolor{black}{$\boldsymbol{\mu}_m$} and covariance matrix \textcolor{black}{$\boldsymbol{\Sigma}_m$}, and \textcolor{black}{$\mathcal{M}(\boldsymbol{\theta}_m)$} is a Multinomial distribution with \textcolor{black}{$\boldsymbol{\theta}_m$} as the frequency parameter, and we use $\psi = (\boldsymbol{\mu},\boldsymbol{\Sigma},\boldsymbol{\theta})$ to denote all the model parameters. We next use the posterior distribution calculations to update cell type assignments for a subset of the cells. Specifically, we randomly select a set of non-adjacent cells in the adjacency graph $\boldsymbol{G}$ and update their types by the posterior probability. Next, the neighborhood count matrix for all cells, $\mathbf{Y}$, is updated, and is used in the next iteration. We continue with  this iterative process  until convergence. This method extends the well known Iterative Condition Modes (ICM) update method \cite{besag1986statistical} by updating multiple cells in each iteration instead of a single one. However, since we only update non adjacent cells, those updated cells still have the same neighborhood after each round of updates guaranteeing convergence due to the monotonical increase in overall likelihood.  
+
+\subsection{Learning model parameters (M-step)}
+For M-step, we have:
+\textcolor{black}{
+\begin{equation}
+Q(\psi|\psi_{old}) = \sum_{i=1}^{D}{\sum_{m}{log[P_{\psi}(x^i,y^i,z^i=m)]\cdot P_{\psi_{old}}(z^i=m|x^i,y^i)}}
+\end{equation}
+}
+When conditioning on the cell type, the values observed for the gene expression $x^i$ and neighborhood for a cell become independent.  Thus, we can write:
+\textcolor{black}{
+\begin{equation}
+\begin{split}
+Q(\psi|\psi_{old}) = \sum_{i=1}^{D}\sum_{m}&log[P_{\psi}(x^i|z^i=m)\cdot P_{\psi}(y^i|z^i=m)\\
+&\cdot P_{\psi}(z^i=m)]\cdot P_{\psi_{old}}(z^i=m|x^i,y^i)
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+P_{\psi_{old}}&(z^i=m|x^i,y^i)=\\
+&\frac{P_{\psi_{old}}(x^i|z^i=m)\cdot P_{\psi_{old}}(y^i|z^i=m)\cdot P_{\psi_{old}}(z^i=m)}{\sum_{z^i}{P_{\psi_{old}}(x^i|z^i)\cdot P_{\psi_{old}}(y^i|z^i)}\cdot P_{\psi_{old}}(z^i)}
+\end{split}
+\end{equation}
+}
+So as mentioned above (Section \ref{expectation}), the posterior distribution is calculated using an alternated ICM algorithm, in which \textcolor{black}{$P(x^i|z=m)$} follows a multivariate Gaussian distribution \textcolor{black}{$\mathcal{N}(\boldsymbol{\mu}_m,\boldsymbol{\Sigma}_m)$}, and the neighborhood vector for each cell \textcolor{black}{$P(y^i|z=m)$} follows a Multi-Nominal distribution \textcolor{black}{$\mathcal{M}(\boldsymbol{\theta}_m)$}. We set \textcolor{black}{$P(y^i|z=m) = \frac{k!}{y_1^i!... 
+y_M^i!}\theta_{m,1}^{y_1^i}\cdot\cdot\cdot\theta_{m,M}^{y_M^i}$}, where M is the number of cell types, k is the number of neighbourhood cells, $(\theta_{ij})\in \mathbb{R}_{M\times M}$ is the neighborhood frequency of cell type j given the current cell type i, and is row-wise normalized so that $||\boldsymbol{\theta}_m||_1 = 1$, where $\boldsymbol{\theta}_m$ is the $m_{th}$ row of $\boldsymbol{\theta}$. $\pi_m = P_{\theta}(z^i=m)$ is the prior distribution for cell types.
+
+With \textcolor{black}{$P_{\phi_{old}}(z^i=m|x^i,y^i) = \gamma_{im}$}, then by maximizing the given Q function, we can obtain the parameters:
+\textcolor{black}{
+\begin{equation}
+\label{max_step}
+\begin{split}
+    &\boldsymbol{\mu}_m = \frac{\sum_i{\gamma_{im}\cdot x^i}}{\sum_{i}{\gamma_{im}}},\;
+    \boldsymbol{\Sigma}_m = \frac{\sum_i{\gamma_{im}\cdot (x^i-\mu_m)(x^i-\mu_m)^T}}{\sum_{i}{\gamma_{im}}},\;\\
+    &\pi_m = \frac{\sum_i{\gamma_{im}}}{\sum_{i,m}{\gamma_{im}}},\;
+    \theta_{m,j} = \frac{\sum_i{\gamma_{im}\cdot y_j^i}}{\sum_{i,j }{\gamma_{im}\cdot y_j^i}}
+\end{split}
+\end{equation}
+}
+The above likelihood function assumes equal weight for each term in the two types of data (expression and neighborhood). However, there are often much more genes than cell types which can lead to over reliance on the expression data. We use two ways to address this problem, first our model is using the dimensional-reduced gene expression as input, instead of the raw expression profile. But the dimension of this input can still be high, e.g. 20, compared to the typical cell type number to be clustered, for example 7, thus then we include a weight term that balances the contribution of the gene and spatial components, named power factor (see section \ref{power_factor}). And also during EM training, the neighborhood count is calculated in term of the assigned probability (a soft update), while usual multinomial distribution is defined in $\mathbb{N}$, so we expand the scope of the multinomial distribution to $\mathbb{R}$ to address this. See Appendix \ref{continue_MN} for details.
+
+\subsection{Dimensionality reduction using denoising autoencoder}
+A dimension reduced representation of the original gene expression data is used as the input to our model. While the original gene expression data usually does not follow a Gaussian distribution, by using a denoising autoencoder we can transform the data to better fit such model \cite{vincent2008extracting}. We use a single layer linear neural network for the auto-encoder though it is possible to adapt the method to use multi-layered networks if the outcome does not fit the required Guassian distribution.  \textcolor{black}{We note that when comparing FICT to the expression only GMM method  we use the same reduced dimension data as input to both. Thus, the only difference between the GMM model and FICT is the use of the spatial information.}
+\begin{figure*}[hbt!]
+    \includegraphics[width=\textwidth]{figs/accur+scatter.png}
+    \caption{Evaluation using simulated data. {\bf Top} Simulated ground truth cell type assignments. Cells locations are from the MERFISH dataset (see Figure \ref{fig:coordinate_sampling} for selected cells). 4 neighbourhood frequency configurations were simulated: (A) Addictive configuration where cells prefer to aggregate with cells from same type. (B) Exclusive configuration where type 1 and type 2 cells are mixed (green and purple cells) while type 3 cells (yellow cells) cluster together. (C) Consecutive configuration where, type 1 cells surround type 2 cells but not type 3 cells. (D) Cell types assignments from the MERFISH paper (yellow - Ependymal cells, green - Excitatory cells and purple -  inhibitory cells). \textcolor{black}{(E) A mixture  model where neighborhood distribution for each cell type is a mixture of the distributions in A and D.} {\bf Bottom} performance of the 5 methods we tested on simulated datasets. Accuracy for each method is averaged from 50 random expression assignment (Methods). p value is calculated using paired samples t-test. **** P<0.0001}\label{fig:simulate_accuracy2} \label{fig:coordinate_simulation2}
+\end{figure*}
+\subsection{Evaluation using simulated data}
+While a number of spatial transcriptomics datasets exist, we do not have ground truth information about cell types in these studies. Thus, we first tested our method using simulated data where we can assign both expression and cell type and test if the method can correctly recover the cell types. 
+As noted in Methods, generating simulated data for such analysis is not trivial since the data needs to satisfy both expression and location constraints. To enable a realistic setting for simulation analysis we used the spatial information from a real dataset (subset of the MERFISH dataset\ref{fig:coordinate_sampling}). See Methods for details about the simulation setup. We used the simulated data to test \fict\ and to compare it to four prior generative and discriminative methods that have been previously used to assign cell types in spatial transcriptomics data. Three of these (GMM \cite{tian2019clustering,xie2016unsupervised}, scanpy \cite{wolf2018scanpy,traag2019louvain} and Seurat \cite{stuart2019comprehensive,butler2018integrating,blondel2008fast}) only use expression data for clustering while the fourth, \smfish\ combines gene expression data with cell location and neighborhood information. However, unlike \fict\,  \smfish\ only considers neighboring cells of the same type (similar to only manually setting the diagonal values in the \fict\ cell neighborhood matrix and ignoring the off diagonal elements). 
+
+In addition to using the cell type assignments from the original paper we also simulated \textcolor{black}{four} other cell type assignment settings. Results are presented in Fig.\ref{fig:simulate_accuracy2}. As can be seen, for all simulation settings \fict\ is the best performing method followed by Seurat. \fict\ obtains almost perfect accuracy on all settings, significantly improving upon Seurat and all other methods we compared to (P < 0.0001 using paired samples t-test)\ref{table:accuracy2}. \textcolor{black}{Cluster assignment examples for all methods can be found in supplementary Figure \ref{fig:sim_scatter}}  
+
+We also compared \fict\ and the other methods using simulated location and expression data (Methods). Again, FICT significantly outperformed all other methods (Figure \ref{fig:simulate_accuracy} and Table \ref{table:accuracy}). \textcolor{black}{we also tested the robustness of FICT and determined that it was robust to random initialization and to a wide range of values for determining the set of neighbors for each cell (Figures \ref{fig:likelihood} and \ref{fig:td_k}).}
+
+
+\begin{figure*}[h]
+    \includegraphics[width=\textwidth]{figs/cv.png}
+    \caption{Mean Adjusted Rand index (ARI) based on cross validation analysis of the MERFISH dataset. Results presented for expression only GMM, \smfish\ and \fict. Each entry (i,j) in the matrix represents the ARI of the two cluster assignments (one learned on animal A and applied to animal B and the other learned directly on B). (A-C) Results for the 7 Male animals (A) GMM, (B) \smfish\ and (C) \fict. (D-F) Results for the 4 Females (D) GMM, (E) \smfish\ and (F) \fict. \textcolor{black}{The x and y axis is the index of the dataset being cross validated on.}}
+    \label{fig:cv}
+\end{figure*}
+\subsection{Performance on the MERFISH dataset}
+We next tested \fict\ using real single cell spatial transcriptomics data. We first focused on mouse hypothalamus data generated by the multiplexed error-robust fluorescence \textit{in situ} hybridization (MERFISH) method \cite{moffitt2018molecular}. The MERFISH data profiles the expression of 258 genes in 480,000 cells from 11 animals (4 females and 7 males). 
+Since there is no ground truth for this data, we used a different approach to compare the different clustering methods. For all gender pairs (i.e. 21 male pairs and 6 female pairs) we performed the following analysis. Let A and B be a pair of animals from the same gender. We first train \fict\ on A and use the parameters learned for the model trained on A to assign cells in B. We next learn a \fict\ model for B. We then compare the Adjusted Rand Index (ARI) of the clustering results for the two animals. Higher ARIs mean that the results are more consistent between animals indicating better fit to the underlying biology. Note that this process is not symmetric and so results for training on A and testing on B would be different from those trained on B and tested on A. 
+
+Results for this comparison are presented in Figure \ref{fig:cv} for both female and male animals. Note that since both Seurat and scanpy are not generative methods the models they learn on one dataset cannot be directly applied to another. Thus, for the real data we compared \fict\ to \smfish\ and GMM. Results show that for 32 of the 54 pairs (59\%) FICT is more consistent than GMM. The result for the larger dataset of male pairs is (29/42, 69\%). The improvement upon \smfish\ is even larger than that and \fict\ is more consistent in 52 of the 54 pairs (96.3\%). \textcolor{black}{We also tried compare to Seurat and scanpy by learning a classifier using the clustering of one animal and comparing the assignments of the learned classifier to the unsupervised clustering using Seurat and scanpy on another animal. As expected, results indicate that performance of such supervised / unsupervised comparisons is inferior to the results of the generative models as we show in Figure \ref{fig:sscv}.} \textcolor{black}{We note that based on prior studies that indicated that gene expression and cell distribution differ based on gender   \cite{dewing2003sexually}, \cite{mccarthy2011reframing}, the above analysis was performed by only testing models learned from male animals on male animals and from female animals on female animals.}
+\begin{figure*}[hbt!]
+    \includegraphics[width=\textwidth]{figs/Zoomed_In.png}
+    \caption{\fict\ can correct expression noise. Cell type assignments using expression only GMM (left) and \fict\ (right). Using the spatial information \fict\ correctly assigns Ependymal cells along the periventricular hypothalamic nucleus. In contast, the GMM method mistakenly  classified the cell as OD Immature Cell.}
+    \label{fig:Zoomin}
+\end{figure*}
+An example of the difference in assignments between expression only GMM clustering and \fict\ is presented in Figure \ref{fig:Zoomin}. As can be seen, the yellow cells (Ependymal cells) are spatially clustered in the center of the hypothalamus tile profiled. However, due to small variations in gene expression, GMM assigns some cells in that cluster as OD Immature cells. In contrast \fict\ is able to correctly assign these cells as shown in the inset. 
+
+\subsubsection{Sub-type clustering}
+\begin{figure*}[hbt!]
+    \centering
+    \includegraphics[width=\textwidth]{figs/Sub_type_merge.png}
+    \caption{Cell subtype clustering on MERFISH data from animal 1. We used \smfish\ (A and D), expression only GMM (B and E) and \fict\ (C and F) to sub-cluster excitatory neurons cells (A, B and C) and inhibitory neuron cells (D, E and F). As can be seen, for both types of neurons \fict\ assignments are better spatially conserved creating a central core for sub-cluster 2 surrounded by cells assigned to sub-cluster 0. In contrast, the expression only assignment mixes cells from different sub-types much more. \smfish\ with Potts model only assigns affinity score between the same cell types making it harder to infer more complex structures of synergistic activity. (E) DE genes for the three \fict\ sub-clusters from the excitatory neurons and (F) inhibitory neurons. As can be seen, even though the sub-clusters are overall similar in terms of their expression profiles, some genes can be identified for each of the sub-clusters. (G) \textbf{GO} enrichment analysis identifies unique functions for each of the sub-clusters on excitatory neurons and (H) inhibitory neurons. Significance of the differential expressed genes is mesured by the log of gene enrichment fold change.}
+    \label{fig:Subtype}
+\end{figure*}
+An important question in the analysis of brain single cell data is the identification of new sub-types of various neuronal cells \cite{lake2016neuronal}. We thus examined the assignments to see if \fict\ can identify new subtypes of neurons. For this, we focused on the subset of excitatory neurons identified in the MERFISH dataset. FICT identified three sub-types of cells that were all determined to be excitatory in the original analysis but displayed different spatial patterns (Figure \ref{fig:Subtype}). To determine if the three sub-clusters are indeed different we performed differential expression (DE) analysis for each of the sub-clusters. While, as expected, their overall expression profiles are similar (leading to their similar assignment by the expression only method) we were able to identify a number of distinct genes for each of these sub-types using MAST \cite{finak2015mast}. We next performed GO enrichment analysis  \cite{ashburner2000gene,gene2019gene,mi2017panther} on the significant DE genes in each sub-clusters. Results are presented in Figure \ref{fig:Subtype}. As can be seen, some unique functional terms are associated with each of the three sub-clusters. For example, the first sub-cluster (e0) seems to be mainly related to response to chemicals. The second (e1) seems to be related to signaling and regulation of calcium homeostasis while the third (e2) is linked to responses to activity changes and behavior. Thus, while all share similar expression profiles and act as excitatory neurons, each of the sub-clusters may have a further specific function as predicted by the spatial clustering. \textcolor{black}{We performed similar sub clustering analysis using the other methods we compared to. Results are presented in Figures \ref{fig:go_gmm} - \ref{fig:go_fict} and indicate that FICT finds both, relevant GO terms such as 'behavior' that are not identified by other methods for this data and more significant enrichment for GO categories related to cell and synapse signaling.}
+We performed similar sub-clustering analysis for inhibitory neurons and obtained similar results both in terms of the more coherent placing of cells from different sub-types and in terms of the unique genes and functions assigned to each of the sub-types identified by \fict\ (Figure \ref{fig:Subtype} C and D).
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figs/osmFISH_scatter.png}
+    \caption{Cluster assignment scatter plot for osmFISH dataset. (A) clusters generated  by FICT and (B)  clusters based on using expression data only as was done in the original paper. As can be seen, FICT correctly distinguishes between neurons in different layers of the brain whereas expression only clustering mixes cells from different brain layers.}
+    \label{fig:osmFISH}
+\end{figure*}
+\subsection{Performance on osmFISH and seqFISH}
+
+To demonstrate the generality of our method we further tested it on two other datasets from two additional spatial transcriptomics platforms: osmFISH \cite{codeluppi2018spatial} and seqFISH \cite{zhu2018identification}. The osmFISH dataset profiled 6,470 cells in the mouse somatosensory cortex. The seqFISH dataset profiled 1,597 cells in the mouse visual cortex. Since both datasets only profiled a single animal we performed the cross validation by manually splitting each dataset into 4 smaller regions with approximately the same number of cells. Results for these analyses are presented in Figure \ref{fig:osmFISH}. \textcolor{black}{As can be seen, FICT was able to successfully cluster cells not just based on type but also based on their layer where as clustering using only the expression data, as was performed in the original study, cannot separate layers as well.} We also performed cross validation analysis, as we did for the MERFISH data. Given the small number of cells for each dataset we see a drop in performance for all generative model methods. As the figure shows, \smfish\ was unable to identify more than a single cell type for many of the cross validation runs resulting in errors. As for GMM and \fict\, while both were able to successfully assign cells in the cross validation runs for the osmFISH and seqFISH datasets, results were not as good as the MERFISH results presented above. Still, even though \fict\ fits more parameters than the expression only model we observe comparable performance on these smaller datasets suggesting that there is no downside to using the joint expression-spatial assignment \ref{fig:cv_oms&seq}.

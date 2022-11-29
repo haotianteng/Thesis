@@ -1,0 +1,18 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {english}{}
+\contentsline {chapter}{Abstract}{iii}{section*.1}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.7}%
+\contentsline {section}{\numberline {1.1}Cell clustering}{1}{section.8}%
+\contentsline {section}{\numberline {1.2}RNA modification detection using Oxford Nanopore sequencing}{2}{section.9}%
+\contentsline {section}{\numberline {1.3}Drug discovery with deep learning}{2}{section.10}%
+\contentsline {chapter}{\numberline {2}Clustering Spatial Transcriptomics}{3}{chapter.11}%
+\contentsline {subsection}{\numberline {2.0.1}A generative model for spatial transcriptomics data}{3}{subsection.13}%
+\contentsline {subsection}{\numberline {2.0.2}Inferring cell types (E-step)}{4}{subsection.17}%
+\contentsline {subsection}{\numberline {2.0.3}Learning model parameters (M-step)}{5}{subsection.19}%
+\contentsline {subsection}{\numberline {2.0.4}Dimensionality reduction using denoising autoencoder}{6}{subsection.24}%
+\contentsline {subsection}{\numberline {2.0.5}Evaluation using simulated data}{6}{subsection.26}%
+\contentsline {subsection}{\numberline {2.0.6}Performance on the MERFISH dataset}{7}{subsection.28}%
+\contentsline {subsubsection}{Sub-type clustering}{8}{section*.30}%
+\contentsline {subsection}{\numberline {2.0.7}Performance on osmFISH and seqFISH}{9}{subsection.33}%
+\contentsline {chapter}{\numberline {A}Frequently Asked Questions}{13}{appendix.34}%
+\contentsline {section}{\numberline {A.1}How do I change the colors of links?}{13}{section.35}%

@@ -1,0 +1,169 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\@writefile{toc}{\contentsline {chapter}{\numberline {2}Clustering Spatial Transcriptomics}{3}{chapter.11}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces {FICT}\ pipeline. A reduced dimension expression profile is generated using a Denoising Autoencoder \cite {vincent2008extracting}, and an undirected graph is constructed according to the spatial locations information. Cells are initially clustered using an expression only GMM. Next, the the model is iteratively optimized using an EM algorithm to improve the joint likelihood of the expression and neighborhood models given both the gene expression representation and the spatial graph. The final output is an assignment of cells to clusters, a Gaussian gene expression model and a Multinomial neighborhood model for each class.\relax }}{3}{figure.caption.12}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:train}{{2.1}{3}{\fict \ pipeline. A reduced dimension expression profile is generated using a Denoising Autoencoder \cite {vincent2008extracting}, and an undirected graph is constructed according to the spatial locations information. Cells are initially clustered using an expression only GMM. Next, the the model is iteratively optimized using an EM algorithm to improve the joint likelihood of the expression and neighborhood models given both the gene expression representation and the spatial graph. The final output is an assignment of cells to clusters, a Gaussian gene expression model and a Multinomial neighborhood model for each class.\relax }{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.0.1}A generative model for spatial transcriptomics data}{3}{subsection.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.0.2}Inferring cell types (E-step)}{4}{subsection.17}\protected@file@percent }
+\newlabel{expectation}{{2.0.2}{4}{Inferring cell types (E-step)}{subsection.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.0.3}Learning model parameters (M-step)}{5}{subsection.19}\protected@file@percent }
+\newlabel{max_step}{{2.8}{5}{Learning model parameters (M-step)}{equation.23}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.0.4}Dimensionality reduction using denoising autoencoder}{6}{subsection.24}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces Evaluation using simulated data. {\bf  Top} Simulated ground truth cell type assignments. Cells locations are from the MERFISH dataset (see Figure \ref  {fig:coordinate_sampling} for selected cells). 4 neighbourhood frequency configurations were simulated: (A) Addictive configuration where cells prefer to aggregate with cells from same type. (B) Exclusive configuration where type 1 and type 2 cells are mixed (green and purple cells) while type 3 cells (yellow cells) cluster together. (C) Consecutive configuration where, type 1 cells surround type 2 cells but not type 3 cells. (D) Cell types assignments from the MERFISH paper (yellow - Ependymal cells, green - Excitatory cells and purple - inhibitory cells). \leavevmode {\color {black}(E) A mixture model where neighborhood distribution for each cell type is a mixture of the distributions in A and D.} {\bf  Bottom} performance of the 5 methods we tested on simulated datasets. Accuracy for each method is averaged from 50 random expression assignment (Methods). p value is calculated using paired samples t-test. **** P<0.0001\relax }}{6}{figure.caption.25}\protected@file@percent }
+\newlabel{fig:simulate_accuracy2}{{2.2}{6}{Evaluation using simulated data. {\bf Top} Simulated ground truth cell type assignments. Cells locations are from the MERFISH dataset (see Figure \ref {fig:coordinate_sampling} for selected cells). 4 neighbourhood frequency configurations were simulated: (A) Addictive configuration where cells prefer to aggregate with cells from same type. (B) Exclusive configuration where type 1 and type 2 cells are mixed (green and purple cells) while type 3 cells (yellow cells) cluster together. (C) Consecutive configuration where, type 1 cells surround type 2 cells but not type 3 cells. (D) Cell types assignments from the MERFISH paper (yellow - Ependymal cells, green - Excitatory cells and purple - inhibitory cells). \textcolor {black}{(E) A mixture model where neighborhood distribution for each cell type is a mixture of the distributions in A and D.} {\bf Bottom} performance of the 5 methods we tested on simulated datasets. Accuracy for each method is averaged from 50 random expression assignment (Methods). p value is calculated using paired samples t-test. **** P<0.0001\relax }{figure.caption.25}{}}
+\newlabel{fig:coordinate_simulation2}{{2.2}{6}{Evaluation using simulated data. {\bf Top} Simulated ground truth cell type assignments. Cells locations are from the MERFISH dataset (see Figure \ref {fig:coordinate_sampling} for selected cells). 4 neighbourhood frequency configurations were simulated: (A) Addictive configuration where cells prefer to aggregate with cells from same type. (B) Exclusive configuration where type 1 and type 2 cells are mixed (green and purple cells) while type 3 cells (yellow cells) cluster together. (C) Consecutive configuration where, type 1 cells surround type 2 cells but not type 3 cells. (D) Cell types assignments from the MERFISH paper (yellow - Ependymal cells, green - Excitatory cells and purple - inhibitory cells). \textcolor {black}{(E) A mixture model where neighborhood distribution for each cell type is a mixture of the distributions in A and D.} {\bf Bottom} performance of the 5 methods we tested on simulated datasets. Accuracy for each method is averaged from 50 random expression assignment (Methods). p value is calculated using paired samples t-test. **** P<0.0001\relax }{figure.caption.25}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.0.5}Evaluation using simulated data}{6}{subsection.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.0.6}Performance on the MERFISH dataset}{7}{subsection.28}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces Mean Adjusted Rand index (ARI) based on cross validation analysis of the MERFISH dataset. Results presented for expression only GMM, {smfishHmrf}\ and {FICT}. Each entry (i,j) in the matrix represents the ARI of the two cluster assignments (one learned on animal A and applied to animal B and the other learned directly on B). (A-C) Results for the 7 Male animals (A) GMM, (B) {smfishHmrf}\ and (C) {FICT}. (D-F) Results for the 4 Females (D) GMM, (E) {smfishHmrf}\ and (F) {FICT}. \leavevmode {\color {black}The x and y axis is the index of the dataset being cross validated on.}\relax }}{8}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:cv}{{2.3}{8}{Mean Adjusted Rand index (ARI) based on cross validation analysis of the MERFISH dataset. Results presented for expression only GMM, \smfish \ and \fict . Each entry (i,j) in the matrix represents the ARI of the two cluster assignments (one learned on animal A and applied to animal B and the other learned directly on B). (A-C) Results for the 7 Male animals (A) GMM, (B) \smfish \ and (C) \fict . (D-F) Results for the 4 Females (D) GMM, (E) \smfish \ and (F) \fict . \textcolor {black}{The x and y axis is the index of the dataset being cross validated on.}\relax }{figure.caption.27}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Sub-type clustering}{8}{section*.30}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces {FICT}\ can correct expression noise. Cell type assignments using expression only GMM (left) and {FICT}\ (right). Using the spatial information {FICT}\ correctly assigns Ependymal cells along the periventricular hypothalamic nucleus. In contast, the GMM method mistakenly classified the cell as OD Immature Cell.\relax }}{9}{figure.caption.29}\protected@file@percent }
+\newlabel{fig:Zoomin}{{2.4}{9}{\fict \ can correct expression noise. Cell type assignments using expression only GMM (left) and \fict \ (right). Using the spatial information \fict \ correctly assigns Ependymal cells along the periventricular hypothalamic nucleus. In contast, the GMM method mistakenly classified the cell as OD Immature Cell.\relax }{figure.caption.29}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.0.7}Performance on osmFISH and seqFISH}{9}{subsection.33}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces Cell subtype clustering on MERFISH data from animal 1. We used {smfishHmrf}\ (A and D), expression only GMM (B and E) and {FICT}\ (C and F) to sub-cluster excitatory neurons cells (A, B and C) and inhibitory neuron cells (D, E and F). As can be seen, for both types of neurons {FICT}\ assignments are better spatially conserved creating a central core for sub-cluster 2 surrounded by cells assigned to sub-cluster 0. In contrast, the expression only assignment mixes cells from different sub-types much more. {smfishHmrf}\ with Potts model only assigns affinity score between the same cell types making it harder to infer more complex structures of synergistic activity. (E) DE genes for the three {FICT}\ sub-clusters from the excitatory neurons and (F) inhibitory neurons. As can be seen, even though the sub-clusters are overall similar in terms of their expression profiles, some genes can be identified for each of the sub-clusters. (G) \textbf  {GO} enrichment analysis identifies unique functions for each of the sub-clusters on excitatory neurons and (H) inhibitory neurons. Significance of the differential expressed genes is mesured by the log of gene enrichment fold change.\relax }}{10}{figure.caption.31}\protected@file@percent }
+\newlabel{fig:Subtype}{{2.5}{10}{Cell subtype clustering on MERFISH data from animal 1. We used \smfish \ (A and D), expression only GMM (B and E) and \fict \ (C and F) to sub-cluster excitatory neurons cells (A, B and C) and inhibitory neuron cells (D, E and F). As can be seen, for both types of neurons \fict \ assignments are better spatially conserved creating a central core for sub-cluster 2 surrounded by cells assigned to sub-cluster 0. In contrast, the expression only assignment mixes cells from different sub-types much more. \smfish \ with Potts model only assigns affinity score between the same cell types making it harder to infer more complex structures of synergistic activity. (E) DE genes for the three \fict \ sub-clusters from the excitatory neurons and (F) inhibitory neurons. As can be seen, even though the sub-clusters are overall similar in terms of their expression profiles, some genes can be identified for each of the sub-clusters. (G) \textbf {GO} enrichment analysis identifies unique functions for each of the sub-clusters on excitatory neurons and (H) inhibitory neurons. Significance of the differential expressed genes is mesured by the log of gene enrichment fold change.\relax }{figure.caption.31}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces Cluster assignment scatter plot for osmFISH dataset. (A) clusters generated by FICT and (B) clusters based on using expression data only as was done in the original paper. As can be seen, FICT correctly distinguishes between neurons in different layers of the brain whereas expression only clustering mixes cells from different brain layers.\relax }}{11}{figure.caption.32}\protected@file@percent }
+\newlabel{fig:osmFISH}{{2.6}{11}{Cluster assignment scatter plot for osmFISH dataset. (A) clusters generated by FICT and (B) clusters based on using expression data only as was done in the original paper. As can be seen, FICT correctly distinguishes between neurons in different layers of the brain whereas expression only clustering mixes cells from different brain layers.\relax }{figure.caption.32}{}}
+\@setckpt{Chapters/Aim1}{
+\setcounter{page}{12}
+\setcounter{equation}{8}
+\setcounter{enumi}{0}
+\setcounter{enumii}{0}
+\setcounter{enumiii}{0}
+\setcounter{enumiv}{0}
+\setcounter{footnote}{0}
+\setcounter{mpfootnote}{0}
+\setcounter{part}{0}
+\setcounter{chapter}{2}
+\setcounter{section}{0}
+\setcounter{subsection}{7}
+\setcounter{subsubsection}{0}
+\setcounter{paragraph}{0}
+\setcounter{subparagraph}{0}
+\setcounter{figure}{6}
+\setcounter{table}{0}
+\setcounter{LT@tables}{1}
+\setcounter{LT@chunks}{1}
+\setcounter{caption@flags}{0}
+\setcounter{continuedfloat}{0}
+\setcounter{tabx@nest}{0}
+\setcounter{listtotal}{0}
+\setcounter{listcount}{0}
+\setcounter{liststart}{0}
+\setcounter{liststop}{0}
+\setcounter{citecount}{0}
+\setcounter{citetotal}{0}
+\setcounter{multicitecount}{0}
+\setcounter{multicitetotal}{0}
+\setcounter{instcount}{0}
+\setcounter{maxnames}{3}
+\setcounter{minnames}{1}
+\setcounter{maxitems}{3}
+\setcounter{minitems}{1}
+\setcounter{citecounter}{0}
+\setcounter{maxcitecounter}{0}
+\setcounter{savedcitecounter}{0}
+\setcounter{uniquelist}{0}
+\setcounter{uniquename}{0}
+\setcounter{refsection}{0}
+\setcounter{refsegment}{0}
+\setcounter{maxextratitle}{0}
+\setcounter{maxextratitleyear}{0}
+\setcounter{maxextraname}{0}
+\setcounter{maxextradate}{0}
+\setcounter{maxextraalpha}{0}
+\setcounter{abbrvpenalty}{50}
+\setcounter{highnamepenalty}{50}
+\setcounter{lownamepenalty}{25}
+\setcounter{maxparens}{3}
+\setcounter{parenlevel}{0}
+\setcounter{mincomprange}{10}
+\setcounter{maxcomprange}{100000}
+\setcounter{mincompwidth}{1}
+\setcounter{afterword}{0}
+\setcounter{savedafterword}{0}
+\setcounter{annotator}{0}
+\setcounter{savedannotator}{0}
+\setcounter{author}{0}
+\setcounter{savedauthor}{0}
+\setcounter{bookauthor}{0}
+\setcounter{savedbookauthor}{0}
+\setcounter{commentator}{0}
+\setcounter{savedcommentator}{0}
+\setcounter{editor}{0}
+\setcounter{savededitor}{0}
+\setcounter{editora}{0}
+\setcounter{savededitora}{0}
+\setcounter{editorb}{0}
+\setcounter{savededitorb}{0}
+\setcounter{editorc}{0}
+\setcounter{savededitorc}{0}
+\setcounter{foreword}{0}
+\setcounter{savedforeword}{0}
+\setcounter{holder}{0}
+\setcounter{savedholder}{0}
+\setcounter{introduction}{0}
+\setcounter{savedintroduction}{0}
+\setcounter{namea}{0}
+\setcounter{savednamea}{0}
+\setcounter{nameb}{0}
+\setcounter{savednameb}{0}
+\setcounter{namec}{0}
+\setcounter{savednamec}{0}
+\setcounter{translator}{0}
+\setcounter{savedtranslator}{0}
+\setcounter{shortauthor}{0}
+\setcounter{savedshortauthor}{0}
+\setcounter{shorteditor}{0}
+\setcounter{savedshorteditor}{0}
+\setcounter{labelname}{0}
+\setcounter{savedlabelname}{0}
+\setcounter{institution}{0}
+\setcounter{savedinstitution}{0}
+\setcounter{lista}{0}
+\setcounter{savedlista}{0}
+\setcounter{listb}{0}
+\setcounter{savedlistb}{0}
+\setcounter{listc}{0}
+\setcounter{savedlistc}{0}
+\setcounter{listd}{0}
+\setcounter{savedlistd}{0}
+\setcounter{liste}{0}
+\setcounter{savedliste}{0}
+\setcounter{listf}{0}
+\setcounter{savedlistf}{0}
+\setcounter{location}{0}
+\setcounter{savedlocation}{0}
+\setcounter{organization}{0}
+\setcounter{savedorganization}{0}
+\setcounter{origlocation}{0}
+\setcounter{savedoriglocation}{0}
+\setcounter{origpublisher}{0}
+\setcounter{savedorigpublisher}{0}
+\setcounter{publisher}{0}
+\setcounter{savedpublisher}{0}
+\setcounter{language}{0}
+\setcounter{savedlanguage}{0}
+\setcounter{origlanguage}{0}
+\setcounter{savedoriglanguage}{0}
+\setcounter{pageref}{0}
+\setcounter{savedpageref}{0}
+\setcounter{textcitecount}{0}
+\setcounter{textcitetotal}{0}
+\setcounter{textcitemaxnames}{0}
+\setcounter{biburlbigbreakpenalty}{100}
+\setcounter{biburlbreakpenalty}{200}
+\setcounter{biburlnumpenalty}{0}
+\setcounter{biburlucpenalty}{0}
+\setcounter{biburllcpenalty}{0}
+\setcounter{smartand}{1}
+\setcounter{bbx:relatedcount}{0}
+\setcounter{bbx:relatedtotal}{0}
+\setcounter{Item}{0}
+\setcounter{Hfootnote}{0}
+\setcounter{bookmark@seq@number}{14}
+\setcounter{section@level}{2}
+}
